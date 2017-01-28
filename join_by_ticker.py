@@ -3,7 +3,7 @@ import pickle
 import pandas as pd
 
 
-def preproces_data(filename, col_names):
+def remove_end(filename, col_names):
     data = pd.read_csv(filename, sep=" ", names=col_names)
     return data
 
@@ -29,14 +29,16 @@ if __name__ == '__main__':
     columns_1 = pickle.load(open(args.column_names_1, 'rb'))
     columns_2 = pickle.load(open(args.column_names_2, 'rb'))
 
-    constituents_100 = preproces_data(args.filename_1, columns_1)
+    constituents_100 = pd.read_csv(args.filename_1, sep=" ", names=columns_1)
+    constituents_100['ticker'] = constituents_100['ticker'].apply(lambda x: x[:-2])
+    stock_codes = pd.read_csv(args.filename_2, sep=" ", names=columns_2)
+    data_industries = pd.read_csv(args.filename_3, names=["name", "ticker", "industry", "a", "b"])
 
-    stock_codes = preproces_data(args.filename_2, columns_2)
+    stock_codes_industry = pd.merge(stock_codes, data_industries, on='ticker', how='inner')
 
-    data = pd.read_csv(args.filename_3)
+    ftse_100_industries = pd.merge(constituents_100, data_industries, on='ticker', how='inner')
+    ftse_100_stock_codes_intersection = pd.merge(constituents_100, stock_codes, on='ticker', how='inner')
 
-    print constituents_100
-    print stock_codes
-    print data
+    ftse_100_stock_codes_intersection.to_csv("./ftse_100_stock_codes_intersection.csv")
 
 
