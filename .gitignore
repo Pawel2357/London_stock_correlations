@@ -1,4 +1,1 @@
-*.txt
-*.jpg
-*.p
-*.csv
+.ipynb*
